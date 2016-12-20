@@ -24,26 +24,31 @@ favs=1000 # Number of favs to consider
 # This script will create various files:
 # followings.txt -> users you currently follow
 # favorites.txt -> users you have faved in the given period
+# legacy.txt -> users you follow but haven’t faved in a while
 # unfollowed.txt -> users you have unfollowed using altlast.sh
+
+# Protip: Use "comm -12 followings.txt favorites.txt" to see 
+# which users you’ve faved but currently don’t follow
 
 t followings -l | tail -n +2 | awk '{print $13'} | sort -u > followings.txt
 t favorites -l -n ${favs} | tail -n +2 | awk '{print $5'} | sort -u > favorites.txt
 
 legacy=$(comm -23 followings.txt favorites.txt)
+echo "${legacy}" > legacy.txt
 
 echo "[-] Found $(wc -l <<< ${legacy}) accounts which you haven’t faved in a while"
 
 for user in ${legacy}; do
-	echo -e "\n[-] Showing details for user ${user}:"
-	t whois ${user}
-	echo -n "[?] Do you want to unfollow ${user}? [yN]: "
-	
-	read answer
-	case ${answer} in
-		"y")
-			t unfollow ${user} > /dev/null
-			echo "[x] You’ve unfollowed ${user}"
-			echo "${user}" >> unfollowed.txt
-			;;
-	esac
+    echo -e "\n[-] Showing details for user ${user}:"
+    t whois ${user}
+    echo -n "[?] Do you want to unfollow ${user}? [yN]: "
+    
+    read answer
+    case ${answer} in
+        "y")
+            t unfollow ${user} > /dev/null
+            echo "[x] You’ve unfollowed ${user}"
+            echo "${user}" >> unfollowed.txt
+            ;;
+    esac
 done
