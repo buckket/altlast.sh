@@ -28,7 +28,7 @@ favs=1000 # Number of favs to consider
 # legacy -> users you follow but haven’t faved in a while
 # unfollowed -> users you have unfollowed using altlast.sh
 
-# Protip: Use "comm -12 followings favorites" to see 
+# Protip: Use "comm -13 followings favorites" to see
 # which users you’ve faved but currently don’t follow
 
 t followings -l | tail -n +2 | awk '{print $13'} | sort -u > followings
