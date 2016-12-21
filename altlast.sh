@@ -39,9 +39,13 @@ comm -23 followings favorites > legacy
 printf "[-] Found %d accounts which you haven’t faved in a while\n" "$(wc -l < legacy)"
 
 for user in $(cat legacy); do
+    if $(grep -Fxq ${user} whitelist); then
+        continue
+    fi
+
     printf "\n[-] Showing details for user %s\n" "${user}:"
     t whois ${user}
-    printf "[?] Do you want to unfollow %s? [yN]: " "${user}"
+    printf "[?] Do you want to unfollow %s? [yNi]: " "${user}"
     
     read answer
     case ${answer} in
@@ -50,5 +54,8 @@ for user in $(cat legacy); do
             printf "[x] You’ve unfollowed %s\n" "${user}"
             echo "${user}" >> unfollowed
             ;;
+        "i")
+            printf "[x] Added %s to whitelist, won’t ask again\n" "${user}"
+            echo "${user}" >> whitelist
     esac
 done
